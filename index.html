@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PSJB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Cairo:wght@400;600;800&family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#06090a; --bg-2:#0b1210; --card:#0e1712; --card-2:#122019;
+    --line: rgba(238,244,232,.09); --ink:#edf2ea; --muted:#8ea296;
+    --gold:#d8b465; --gold-2:#f3dd94; --gold-dark:#7c5f28; --radius:12px;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+  *{box-sizing:inherit;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{ margin:0; background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(216,180,101,.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 110% 10%, rgba(90,180,120,.10), transparent 55%), var(--bg);
+    color:var(--ink); font-family:'Inter',sans-serif; line-height:1.5; -webkit-font-smoothing:antialiased; }
+  body.lang-ar{ font-family:'Cairo',sans-serif; } body.lang-hi{ font-family:'Baloo 2',sans-serif; }
+  h1,h2,.display{ font-family:'Teko',sans-serif; font-weight:600; letter-spacing:.01em; }
+  body.lang-ar h1, body.lang-ar h2{ font-family:'Cairo',sans-serif; font-weight:800; letter-spacing:0; }
+  body.lang-hi h1, body.lang-hi h2{ font-family:'Baloo 2',sans-serif; font-weight:800; letter-spacing:0; }
+  a{ color:inherit; } .wrap{ max-width:1080px; margin:0 auto; padding:0 20px; }
+
+  .topsticky{ position:sticky; top:0; z-index:30; padding-top:env(safe-area-inset-top,0px);
+    backdrop-filter:blur(10px); background:rgba(6,9,10,.82); border-bottom:1px solid var(--line); }
+  .ticker{ display:flex; gap:8px; align-items:center; overflow-x:auto; white-space:nowrap;
+    font-size:.72rem; color:var(--gold-2); padding:6px 20px; border-bottom:1px solid var(--line); }
+  .ticker span:not(:last-child)::after{ content:"•"; margin-inline-start:8px; color:var(--gold-dark); }
+  .navrow{ display:flex; align-items:center; justify-content:space-between; padding:12px 20px; max-width:1080px; margin:0 auto; gap:10px; }
+  .brandmark{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .badgemark{ width:32px; height:32px; border-radius:50%; border:2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; font-family:'Teko',sans-serif; font-size:12px; color:var(--gold-2); flex:none; }
+  .brand{ font-size:1.25rem; white-space:nowrap; }
+  .tabs{ display:flex; gap:6px; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:3px; }
+  .tabs button{ background:none; border:0; color:var(--muted); padding:7px 16px; border-radius:999px; font:inherit; font-weight:700; font-size:.85rem; cursor:pointer; }
+  .tabs button.active{ background:var(--gold); color:#1a1406; }
+
+  .hero{ position:relative; padding:44px 0 32px; overflow:hidden; }
+  .hero svg.pitch{ position:absolute; inset:auto 0 -40px 0; width:100%; height:200px; opacity:.32; pointer-events:none; }
+  .hero-inner{ position:relative; }
+  .chip{ display:inline-block; font-size:.76rem; color:var(--gold-2); border:1px solid var(--gold-dark);
+    background:rgba(216,180,101,.08); border-radius:999px; padding:4px 12px; margin-bottom:14px; }
+  .hero h1{ font-size:clamp(2.2rem,6vw,3.6rem); margin:0 0 8px; line-height:.95; }
+  .hero p{ color:var(--muted); max-width:58ch; font-size:1rem; margin:0; }
+
+  .callout{ border-inline-start:3px solid var(--gold); background:rgba(216,180,101,.07);
+    border-radius:8px; padding:13px 18px; margin:0 0 22px; }
+  .callout .tag, .rec .tag{ display:block; font-size:.66rem; font-weight:700; color:var(--gold-2);
+    letter-spacing:.05em; margin-bottom:6px; text-transform:uppercase; }
+  .callout p{ margin:0; color:var(--muted); font-size:.88rem; max-width:72ch; }
+
+  .rec{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; margin:0 0 24px; }
+  .rec h2{ font-size:1.35rem; margin:2px 0 3px; } .rec .sub{ color:var(--muted); font-size:.83rem; margin:0 0 12px; }
+  .rec-row{ display:flex; gap:9px; flex-wrap:wrap; }
+  .rec-row input{ flex:1; min-width:150px; background:var(--bg-2); border:1px solid var(--line); color:var(--ink);
+    padding:10px 13px; border-radius:8px; font:inherit; font-size:.95rem; }
+  .rec-row button{ background:var(--gold); color:#1a1406; border:0; padding:10px 18px; border-radius:8px;
+    font:inherit; font-weight:700; font-size:.88rem; cursor:pointer; }
+  .rec-results{ margin-top:12px; color:var(--muted); font-size:.85rem; }
+  .rec-results .found-list{ display:flex; flex-direction:column; gap:7px; margin-top:9px; }
+  .rec-hit{ display:flex; justify-content:space-between; gap:10px; align-items:baseline; background:var(--bg-2);
+    border:1px solid var(--line); border-radius:8px; padding:9px 11px; text-decoration:none; color:var(--ink); }
+  .rec-hit b{ font-weight:700; font-size:.9rem; } .rec-hit span{ color:var(--muted); font-size:.76rem; }
+
+  section{ padding:10px 0; }
+  .sec-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:6px;}
+  .sec-head h2{ font-size:1.6rem; margin:0; } .sec-head span{ color:var(--muted); font-size:.82rem; }
+
+  .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:6px 0 36px; }
+  .step{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; }
+  .step .num{ font-family:'Teko',sans-serif; font-size:1.9rem; color:var(--gold); line-height:1; }
+  body.lang-ar .step .num, body.lang-hi .step .num{ font-family:inherit; font-weight:800; }
+  .step h3{ margin:5px 0 3px; font-size:1.02rem; font-weight:700; } .step p{ margin:0; color:var(--muted); font-size:.82rem; }
+
+  .squad{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+  .card{ position:relative; border-radius:var(--radius); padding:1px;
+    background:linear-gradient(155deg,var(--gold) 0%, var(--gold-dark) 35%, transparent 55%); text-decoration:none; }
+  .card-in{ background:linear-gradient(165deg,var(--card-2),var(--card) 60%);
+    border-radius:calc(var(--radius) - 1px); padding:16px; height:100%; display:flex; flex-direction:column; gap:7px; }
+  .tag-pill{ position:absolute; top:11px; inset-inline-start:-6px; background:var(--gold); color:#1a1406;
+    font-size:.58rem; font-weight:700; letter-spacing:.02em; padding:3px 9px 3px 13px; border-radius:0 4px 4px 0; transform:rotate(-6deg); max-width:85%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .card-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-top:13px; gap:8px; }
+  .stat .val{ font-family:'Teko',sans-serif; font-size:1.7rem; color:var(--gold-2); line-height:1; white-space:nowrap; }
+  body.lang-ar .stat .val, body.lang-hi .stat .val{ font-family:inherit; font-weight:800; font-size:1.15rem; }
+  .stat .lbl{ font-size:.56rem; color:var(--muted); letter-spacing:.03em; text-align:end; max-width:90px; }
+  .card h3{ font-size:1.08rem; margin:0; font-weight:700; } .card .dev{ font-size:.73rem; color:var(--gold-2); margin:0; }
+  .card p.desc{ margin:0; color:var(--muted); font-size:.81rem; flex:1; }
+  .openbtn{ align-self:flex-start; margin-top:2px; font-size:.8rem; font-weight:600;
+    border:1px solid var(--gold-dark); color:var(--gold-2); padding:6px 13px; border-radius:8px; }
+  .card:hover .openbtn{ background:var(--gold); color:#1a1406; }
+
+  table{ width:100%; border-collapse:collapse; font-size:.87rem; }
+  thead th{ text-align:start; color:var(--muted); font-weight:600; font-size:.73rem; padding:8px 9px; border-bottom:1px solid var(--line); }
+  tbody td{ padding:10px 9px; border-bottom:1px solid var(--line); } tbody tr:last-child td{ border-bottom:0; }
+  .rank{ font-family:'Teko',sans-serif; color:var(--gold); font-size:1.15rem; }
+  body.lang-ar .rank, body.lang-hi .rank{ font-family:inherit; font-weight:800; font-size:.9rem; }
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); }
+  .table-wrap table{ min-width:540px; }
+
+  .credits{ margin:14px 0 6px; } .credits-grid{ display:flex; flex-wrap:wrap; gap:7px; }
+  .credit-chip{ background:var(--card); border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-size:.78rem; color:var(--muted); }
+
+  footer{ margin-top:30px; padding:20px 0 calc(24px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--line); color:var(--muted); font-size:.78rem; }
+  footer p{ margin:0 0 8px; max-width:72ch; }
+  .footer-lang{ position:fixed; bottom:calc(16px + env(safe-area-inset-bottom,0px)); inset-inline-end:16px; z-index:35; }
+  .langbtn{ display:flex; align-items:center; justify-content:center; width:46px; height:46px; padding:0;
+    background:var(--card); border:1px solid var(--gold-dark); color:var(--ink); border-radius:50%;
+    font-size:1.15rem; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.4); }
+  .langbtn span{ display:none; }
+  .langmenu{ position:absolute; inset-inline-end:0; bottom:calc(100% + 8px); background:var(--card-2);
+    border:1px solid var(--line); border-radius:10px; padding:6px; display:none; min-width:170px; box-shadow:0 10px 30px rgba(0,0,0,.4); z-index:40; }
+  .langmenu.open{ display:block; }
+  .langmenu button{ display:block; width:100%; text-align:start; background:none; border:0; color:var(--muted);
+    padding:9px 10px; border-radius:6px; font:inherit; font-size:.88rem; cursor:pointer; }
+  .langmenu button:hover{ background:rgba(216,180,101,.08); color:var(--ink); }
+  .langmenu button.active{ color:var(--gold-2); font-weight:700; }
+
+  .hidden{ display:none !important; }
+  @media (max-width:640px){ .steps{ grid-template-columns:1fr; } }
+  .picker-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:30px; }
+  .picker-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; }
+  .picker-card h3{ margin:0 0 4px; font-size:1.05rem; }
+  .picker-card .picker-desc{ margin:0 0 10px; color:var(--muted); font-size:.8rem; }
+  .picker-row{ display:flex; justify-content:space-between; align-items:center; text-decoration:none; color:var(--ink);
+    background:var(--bg-2); border:1px solid var(--line); border-radius:8px; padding:8px 11px; margin-bottom:7px; font-size:.85rem; }
+  .picker-row:last-child{ margin-bottom:0; }
+  .picker-tag{ font-size:.62rem; font-weight:700; letter-spacing:.03em; color:#1a1406; background:var(--gold); border-radius:999px; padding:2px 8px; }
+  .picker-tag.alt{ color:var(--gold-2); background:transparent; border:1px solid var(--gold-dark); }
+</style>
+</head>
+<body>
+
+<div class="topsticky">
+  <div class="ticker" id="ticker"></div>
+  <div class="navrow">
+    <div class="brandmark"><div class="badgemark">JB</div><div class="brand" data-i18n="brand">PSJB</div></div>
+    <div class="tabs"><button id="tabPs5" class="active">PS5</button><button id="tabPs4">PS4</button></div>
+  </div>
+</div>
+
+<div class="hero">
+  <svg class="pitch" viewBox="0 0 1000 220" preserveAspectRatio="none">
+    <line x1="0" y1="30" x2="1000" y2="30" stroke="#eef4e8" stroke-width="1.5"/>
+    <circle cx="500" cy="30" r="60" fill="none" stroke="#eef4e8" stroke-width="1.5"/>
+    <circle cx="500" cy="30" r="3" fill="#eef4e8"/>
+  </svg>
+  <div class="wrap hero-inner">
+    <span class="chip" data-i18n="badge">PS5 + PS4 · exploits, payloads &amp; tools</span>
+    <h1 data-i18n="brand2">PSJB</h1>
+    <p data-i18n="tagline">Every public entry point, payload and post-JB tool, for both consoles.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="callout"><span class="tag" data-i18n="calloutTag">Offside check</span>
+    <p data-i18n="calloutBody">There is still no public site where visiting a page jailbreaks a live console by itself. A WebKit exploit needs a host page or program you run yourself, which your console then connects to. Firmware ceilings shown here move fast and some are dev-reported rather than tracker-confirmed — check the linked repo before relying on a number.</p>
+  </div>
+
+  <div class="steps" id="steps"></div>
+
+  <section id="ps5Section">
+    <div class="rec"><span class="tag" data-i18n="recTag">VAR review</span>
+      <h2 data-i18n="recTitle">Find your jailbreak</h2><p class="sub" data-i18n="recSub">Type your PS5 firmware version.</p>
+      <div class="rec-row"><input id="ps5FwInput" type="text" inputmode="decimal" placeholder="e.g. 5.50"><button id="ps5FwBtn" data-i18n="recButton">Recommend</button></div>
+      <div class="rec-results" id="ps5FwResults"></div>
+    </div>
+
+    <div class="sec-head"><h2>Quick picker</h2><span>Routes straight to each project's own page</span></div>
+    <div class="picker-grid">
+      <div class="picker-card">
+        <h3>UMTX</h3>
+        <p class="picker-desc">Live browser host. Full kernel jailbreak, FW 1.00 – 5.50.</p>
+        <a class="picker-row" href="https://umtx2.pages.dev/" target="_blank" rel="noopener"><span>Live host</span><span class="picker-tag">OPEN</span></a>
+        <a class="picker-row" href="https://ps5jb.pages.dev" target="_blank" rel="noopener"><span>Live host (idlesauce)</span><span class="picker-tag">OPEN</span></a>
+        <a class="picker-row" href="https://github.com/idlesauce/PS5-Exploit-Host" target="_blank" rel="noopener"><span>Source / self-host</span><span class="picker-tag alt">SOURCE</span></a>
+      </div>
+      <div class="picker-card">
+        <h3>Poopsploit / BD-JB</h3>
+        <p class="picker-desc">Usermode via the Blu-ray app. Not a full jailbreak, up to FW 7.61.</p>
+        <a class="picker-row" href="https://github.com/owendswang/BD-JB5-Poops-Autoloader/releases" target="_blank" rel="noopener"><span>Autoloader releases</span><span class="picker-tag">OPEN</span></a>
+        <a class="picker-row" href="https://github.com/Viktorious-x/ps5-bdjb-modified-ISOs/releases" target="_blank" rel="noopener"><span>All-in-one ISO</span><span class="picker-tag alt">BUNDLE</span></a>
+      </div>
+      <div class="picker-card">
+        <h3>P2JB</h3>
+        <p class="picker-desc">Kernel exploit via the YouTube app. FW 12.02 – 12.70, corroborated across multiple dev sources.</p>
+        <a class="picker-row" href="https://github.com/matem6/P2JB-Y2JB-Porting" target="_blank" rel="noopener"><span>Source repo</span><span class="picker-tag">OPEN</span></a>
+        <a class="picker-row" href="https://psx-place.com/tags/ps5-jailbreak/" target="_blank" rel="noopener"><span>Community thread</span><span class="picker-tag alt">DISCUSS</span></a>
+      </div>
+    </div>
+
+    <div class="sec-head"><h2 data-i18n="webkitTitle">WebKit exploits</h2><span data-i18n="webkitSub">Full kernel jailbreak, via the browser</span></div>
+    <div class="squad" id="ps5Webkit"></div>
+  </section>
+
+  <section id="ps5Section2">
+    <div class="sec-head"><h2 data-i18n="usermodeTitle">Usermode exploits</h2><span data-i18n="usermodeSub">Native code only — not a full jailbreak</span></div>
+    <div class="squad" id="ps5Usermode"></div>
+  </section>
+
+  <section id="ps5Section3">
+    <div class="rec"><span class="tag" data-i18n="payRecTag">VAR review · payloads</span>
+      <h2 data-i18n="payRecTitle">Find your payload</h2><p class="sub" data-i18n="payRecSub">Type your PS5 firmware version.</p>
+      <div class="rec-row"><input id="ps5PayInput" type="text" inputmode="decimal" placeholder="e.g. 6.50"><button id="ps5PayBtn" data-i18n="recButton">Recommend</button></div>
+      <div class="rec-results" id="ps5PayResults"></div>
+    </div>
+    <div class="sec-head"><h2 data-i18n="payloadsTitle">Payloads / HEN</h2><span data-i18n="payloadsSub">Runs after your exploit — homebrew enabler</span></div>
+    <div class="squad" id="ps5Payloads"></div>
+  </section>
+
+  <section id="ps5Section4">
+    <div class="sec-head"><h2 data-i18n="communityTitle">Community</h2></div>
+    <div class="squad" id="ps5Community"></div>
+  </section>
+
+  <section id="ps5Section5">
+    <div class="sec-head"><h2 data-i18n="tableTitle">Coverage table</h2></div>
+    <div class="table-wrap"><table><thead><tr id="ps5TheadRow"></tr></thead><tbody id="ps5Tbody"></tbody></table></div>
+  </section>
+
+  <section id="ps4Section" class="hidden">
+    <div class="rec"><span class="tag" data-i18n="recTag">VAR review</span>
+      <h2 data-i18n="recTitle">Find your jailbreak</h2><p class="sub" data-i18n="recSubPs4">Type your PS4 firmware version.</p>
+      <div class="rec-row"><input id="ps4FwInput" type="text" inputmode="decimal" placeholder="e.g. 9.00"><button id="ps4FwBtn" data-i18n="recButton">Recommend</button></div>
+      <div class="rec-results" id="ps4FwResults"></div>
+    </div>
+    <div class="sec-head"><h2 data-i18n="exploitsTitlePs4">Exploits &amp; hosts</h2></div>
+    <div class="squad" id="ps4Exploits"></div>
+  </section>
+
+  <section id="ps4Section2" class="hidden">
+    <div class="rec"><span class="tag" data-i18n="payRecTag">VAR review · payloads</span>
+      <h2 data-i18n="payRecTitle">Find your payload</h2><p class="sub" data-i18n="payRecSubPs4">Type your PS4 firmware version.</p>
+      <div class="rec-row"><input id="ps4PayInput" type="text" inputmode="decimal" placeholder="e.g. 9.00"><button id="ps4PayBtn" data-i18n="recButton">Recommend</button></div>
+      <div class="rec-results" id="ps4PayResults"></div>
+    </div>
+    <div class="sec-head"><h2 data-i18n="payloadsTitle">Payloads / HEN</h2><span data-i18n="payloadsSub">Runs after your exploit — homebrew enabler</span></div>
+    <div class="squad" id="ps4Payloads"></div>
+  </section>
+
+  <section id="ps4Section3" class="hidden">
+    <div class="sec-head"><h2 data-i18n="communityTitle">Community</h2></div>
+    <div class="squad" id="ps4Community"></div>
+  </section>
+
+  <section id="ps4Section4" class="hidden">
+    <div class="sec-head"><h2 data-i18n="tableTitle">Coverage table</h2></div>
+    <div class="table-wrap"><table><thead><tr id="ps4TheadRow"></tr></thead><tbody id="ps4Tbody"></tbody></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2 data-i18n="toolsTitle">After you're jailbroken</h2><span data-i18n="toolsSub">Managers &amp; utilities, not exploits</span></div>
+    <div class="squad" id="toolsSquad"></div>
+  </section>
+
+  <section class="credits">
+    <div class="sec-head"><h2 data-i18n="creditsTitle">Credits</h2><span data-i18n="creditsSub">None of this exists without these people</span></div>
+    <div class="credits-grid" id="creditsGrid"></div>
+  </section>
+
+  <footer>
+    <p data-i18n="footerNote">Links point only to public, third-party repos, live exploit hosts and forums — nothing except this page itself is hosted by us. Jailbreaking voids your warranty and can break PSN access; using it to pirate games is illegal in most places. Confirm you're on the real project page before downloading anything — fake mirrors of these exact names are common. Firmware numbers shift constantly; treat this as a snapshot, not a guarantee.</p>
+    <p data-i18n="footerCredits">Built for the scene. Not affiliated with Sony.</p>
+    <div class="footer-lang">
+      <button class="langbtn" id="langbtn">🌐 <span data-i18n="languageLabel">Language</span></button>
+      <div class="langmenu" id="langmenu"></div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const LANGS = [
+  {code:"en", native:"English", rtl:false}, {code:"arz", native:"مصري", rtl:true},
+  {code:"ar", native:"العربية", rtl:true}, {code:"es", native:"Español", rtl:false},
+  {code:"fr", native:"Français", rtl:false}, {code:"ru", native:"Русский", rtl:false},
+  {code:"de", native:"Deutsch", rtl:false}, {code:"hi", native:"हिन्दी", rtl:false}
+];
+
+// ---- Shared, language-independent card data ----
+const PS5_WEBKIT = [
+  {tag:"WEBKIT · LIVE HOST", stat:"5.50", lbl:"MAX FW", title:"UMTX Jailbreak", dev:"idlesauce", desc:"Live browser exploit host — open the page in your PS5's browser and run it from there.", entry:"PS5 browser (WebKit)", coverage:"1.00 – 5.50", url:"https://umtx2.pages.dev/", min:1.00, max:5.50},
+  {tag:"WEBKIT · LIVE HOST", stat:"4.xx", lbl:"MULTI-CONSOLE", title:"WizWikii Launcher", dev:"TheWizWikii + idlesauce, Khaled Ahmed", desc:"One address you type into the PS3/PS4/PS5 browser, listing the working exploit + HEN for each console.", entry:"Console browser (WebKit)", coverage:"Varies by console/firmware", url:"https://thewizwikii.github.io/", min:null, max:null},
+  {tag:"WEBKIT", stat:"4.51", lbl:"MAX FW", title:"IPV6 Kernel Exploit", dev:"Cryptogenic / SpecterDev", desc:"The original browser-based kernel exploit that started the PS5 scene.", entry:"PS5 browser (WebKit)", coverage:"Up to 4.51", url:"https://github.com/Cryptogenic/PS5-4.03-Kernel-Exploit", min:3.00, max:4.51},
+  {tag:"WEBKIT", stat:"12.70", lbl:"MAX FW", title:"Slopkit", dev:"jordyidk + Sonic-Iso (via itsPLK)", desc:"Browser exploit chain. Covers 7.00–8.60 directly, extended to 12.02–12.70 via Sonic-Iso's pooP2JB work.", entry:"PS5 browser (WebKit)", coverage:"7.00–8.60 & 12.02–12.70", url:"https://github.com/itsPLK/ps5-webkit-autoloader", min:7.00, max:12.70}
+];
+const PS5_USERMODE = [
+  {tag:"USERMODE", stat:"12.00", lbl:"MAX FW", title:"BD-JB / Poopsploit", dev:"Gezine", desc:"Native code execution via the Blu-ray app.", entry:"Blu-ray app (bd-j)", coverage:"Up to 12.00", url:"https://github.com/owendswang/BD-JB5-Poops-Autoloader/releases", min:4.03, max:12.00},
+  {tag:"USERMODE", stat:"7.60", lbl:"MAX FW", title:"Mast1c0re (Luac0re)", dev:"Gezine", desc:"PS2-remake save bug. Runs PS2 ISOs/homebrew — not a full kernel jailbreak.", entry:"PS2 Classics save", coverage:"Up to 7.60", url:"https://github.com/matem6/UltraC0re/releases", min:1.00, max:7.60},
+  {tag:"USERMODE", stat:"12.70", lbl:"MAX FW", title:"P2JB", dev:"Gezine / cheburek3000", desc:"Kernel read/write via the YouTube app, corroborated across multiple dev release notes.", entry:"YouTube app (Y2JB)", coverage:"12.02 – 12.70", url:"https://github.com/matem6/P2JB-Y2JB-Porting", min:12.02, max:12.70},
+  {tag:"ALL-IN-ONE · LIVE PICKER", stat:"★", lbl:"BUNDLE", title:"poopicker", dev:"soniciso1 (mirrors zecoxao's luasauce)", desc:"Live firmware-matched picker mirroring UMTX, Poopsploit and P2JB builds in retail, testkit and devkit variants.", entry:"PS5 browser (WebKit)", coverage:"1.00 – 12.70 (via mirrored builds)", url:"https://soniciso1.github.io/poopicker/", min:1.00, max:12.70},
+  {tag:"ALL-IN-ONE", stat:"★", lbl:"BUNDLE", title:"Goldengames Autoloader", dev:"robin2kk", desc:"Bundles UMTX2 (1.00–5.50), Slopkit (7.00–12.00) and P2JB (12.02–12.70) into one guided installer.", entry:"USB autoloader", coverage:"1.00 – 12.70 (via bundled tools)", url:"https://github.com/robin2kk/Goldengames-PS5-Autoloader/releases", min:1.00, max:12.70},
+  {tag:"ALL-IN-ONE", stat:"★", lbl:"BUNDLE", title:"BDJB Modified ISO", dev:"Viktorious-x, w/ payloads by Sonic-Iso, EchoStretch, LightningMods", desc:"Disc-based bundle of Poopsploit + UMTX with auto firmware detection, picks the right pipeline for you.", entry:"Blu-ray disc", coverage:"Poopsploit 8.00–12.00, UMTX ≤7.61", url:"https://github.com/Viktorious-x/ps5-bdjb-modified-ISOs/releases", min:null, max:null}
+];
+const PS5_PAYLOADS = [
+  {tag:"HEN", stat:"6.50", lbl:"MAX FW", title:"etaHEN", dev:"LightningMods", desc:"The main PS5 homebrew enabler — acts like custom firmware once you're jailbroken.", url:"https://github.com/LightningMods/etaHEN", min:1.00, max:6.50, coverage:"Up to 6.50"},
+  {tag:"CORE UTIL", stat:"—", lbl:"UNDER ETAHEN", title:"kstuff", dev:"EchoStretch", desc:"Lower-level patch utility that etaHEN builds on for fself/fpkg support.", url:"https://github.com/EchoStretch/kstuff", min:null, max:null, coverage:"Bundled with etaHEN"}
+];
+const PS4_EXPLOITS = [
+  {tag:"WEBKIT · LIVE HOST", stat:"—", lbl:"MULTI-CONSOLE", title:"WizWikii Launcher", dev:"TheWizWikii + idlesauce", desc:"One address you type into the PS4 browser — bundles the exploit and GoldHEN install for you.", entry:"Console browser (WebKit)", coverage:"Varies by firmware", url:"https://thewizwikii.github.io/", min:null, max:null},
+  {tag:"NETWORK EXPLOIT", stat:"11.00", lbl:"MAX FW", title:"PPPwn", dev:"TheOfficialFloW", desc:"Runs from your PC over PPPoE — just a network cable, no browser or game needed.", entry:"PPPoE (your PC)", coverage:"Up to 11.00", url:"https://github.com/TheOfficialFloW/PPPwn", min:1.00, max:11.00},
+  {tag:"WEBKIT", stat:"9.60", lbl:"MAX FW", title:"PSFree", dev:"kmeps4", desc:"Browser-based WebKit exploit framework for PS4.", entry:"PS4 browser (WebKit)", coverage:"Up to 9.60", url:"https://github.com/kmeps4/PSFree", min:1.00, max:9.60},
+  {tag:"GAME EXPLOIT", stat:"—", lbl:"NEEDS GAME", title:"Lua Exploit", dev:"shahrilnet", desc:"Save-file exploit through a Lua-exploitable game — same idea as the PS5's Luac0re.", entry:"Game save", coverage:"Varies by game/firmware", url:"https://github.com/shahrilnet/remote_lua_loader", min:null, max:null}
+];
+const PS4_PAYLOADS = [
+  {tag:"HEN", stat:"11.00", lbl:"SPECIFIC BUILDS", title:"GoldHEN", dev:"GoldHEN team", desc:"The standard PS4 homebrew enabler, with cheats and plugin support.", url:"https://github.com/GoldHEN/GoldHEN", min:5.00, max:11.00, coverage:"5.05 – 11.00 (specific builds)"},
+  {tag:"HEN · OPEN SOURCE", stat:"11.52", lbl:"MAX FW", title:"HEN VTX", dev:"EchoStretch", desc:"Open-source HEN, an alternative to GoldHEN.", url:"https://github.com/EchoStretch/ps4-hen-vtx", min:7.00, max:11.52, coverage:"7.00 – 11.52"}
+];
+const TOOLS = [
+  {tag:"PS4 · PS5", title:"ItemzFlow", dev:"LightningMods", desc:"Open-source homebrew and game manager with a proper UI.", url:"https://psx-place.com/threads/update-v1-06-itemzflow-ps5-homebrew-game-manager-with-ps5-game-support.42429/post-378339"},
+  {tag:"PS4", title:"Apollo Save Tool", dev:"bucanero", desc:"Edit and manage save files on your console.", url:"https://github.com/bucanero/apollo-ps4"},
+  {tag:"PS5", title:"ShadowMount", dev:"ayasns / VoidWhisper", desc:"Auto-mounts and installs game dumps with zero manual setup.", url:"https://github.com/ayasns/ShadowMount2"},
+  {tag:"PS4 · PS5", title:"PS Multi Tools", dev:"SvenGDK", desc:"PKG creation, memory-card and library management across PlayStation generations.", url:"https://github.com/SvenGDK/PS-Multi-Tools/releases"}
+];
+const PS5_COMMUNITY = [
+  {tag:"COMMUNITY", stat:"24/7", lbl:"FORUM", title:"PSX-Place", dev:"Scene forum", desc:"Release threads, firmware trackers and troubleshooting help.", url:"https://psx-place.com/tags/ps5-jailbreak/"},
+  {tag:"TRACKER", stat:"LIVE", lbl:"STATUS", title:"Wololo.net", dev:"Wololo", desc:"The scene's long-running, kept-up-to-date firmware status tracker.", url:"https://wololo.net/ps5-jailbreak-and-custom-firmware/"},
+  {tag:"WIKI", stat:"WIKI", lbl:"REFERENCE", title:"ConsoleMods Wiki", dev:"ConsoleMods community", desc:"Community-maintained modding wiki across consoles.", url:"https://consolemods.org"}
+];
+const PS4_COMMUNITY = [
+  {tag:"COMMUNITY", stat:"24/7", lbl:"FORUM", title:"r/ps4homebrew", dev:"Scene community", desc:"Firmware guides, exploit status and troubleshooting.", url:"https://reddit.birdcat.cafe/r/ps4homebrew"},
+  {tag:"WIKI", stat:"WIKI", lbl:"REFERENCE", title:"ConsoleMods Wiki", dev:"ConsoleMods community", desc:"Community-maintained modding wiki across consoles.", url:"https://consolemods.org"}
+];
+const CREDITS = ["Cryptogenic","SpecterDev","idlesauce","TheFlow","ChendoChap","Znullptr","Sleirsgoevy","Gezine","cheburek3000","jordyidk","itsPLK","LightningMods","EchoStretch","robin2kk","ayasns / VoidWhisper","bucanero","TheOfficialFloW","kmeps4","shahrilnet","n0llptr","GoldHEN team","ufm42","john-tornblom","matem6","owendswang","SvenGDK","Sonic-Iso","TheWizWikii","Khaled Ahmed","Viktorious-x","BenNoxXD","Drakmor","zecoxao","flat_z","AlAzif","StonedModder","BestPig","hzhreal","ntfargo","abkarino","egycnq","earthonion","c0w-ar","SIStro","ItsJokerZz","cblock","BeLegal","Lord Caio Barros","PS5 Payload SDK / elfldr devs","PSX-Place community","Wololo","ConsoleMods"];
+
+function mk(t){ return t; }
+const content = {
+en: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"Every public entry point, payload and post-JB tool, for both consoles.",
+  badge:"PS5 + PS4 · exploits, payloads & tools", languageLabel:"Language",
+  tickerA:"⚠ No one-click host exists for either console", tickerB:"🎮 PS5 + PS4 dev tools tracked", tickerC:"🚫 Not affiliated with Sony",
+  calloutTag:"Offside check", calloutBody:"There is still no public site where visiting a page jailbreaks a live console by itself. A WebKit exploit needs a host page or program you run yourself, which your console then connects to. Firmware ceilings shown here move fast and some are dev-reported rather than tracker-confirmed — check the linked repo before relying on a number.",
+  recTag:"VAR review", recTitle:"Find your jailbreak", recSub:"Type your PS5 firmware version.", recSubPs4:"Type your PS4 firmware version.", recButton:"Recommend",
+  recNone:"No public exploit reaches that firmware yet. The scene moves fast — check back.", recFoundPrefix:"Matches for firmware",
+  payRecTag:"VAR review · payloads", payRecTitle:"Find your payload", payRecSub:"Type your PS5 firmware version.", payRecSubPs4:"Type your PS4 firmware version.",
+  payRecNone:"No public payload covers that firmware yet.", payRecFoundPrefix:"Matches for firmware",
+  webkitTitle:"WebKit exploits", webkitSub:"Full kernel jailbreak, via the browser",
+  usermodeTitle:"Usermode exploits", usermodeSub:"Native code only — not a full jailbreak",
+  exploitsTitlePs4:"Exploits & hosts", payloadsTitle:"Payloads / HEN", payloadsSub:"Runs after your exploit — homebrew enabler",
+  toolsTitle:"After you're jailbroken", toolsSub:"Managers & utilities, not exploits",
+  communityTitle:"Community", creditsTitle:"Credits", creditsSub:"None of this exists without these people",
+  tableTitle:"Coverage table", thHash:"#", thExploit:"Exploit", thDev:"Dev", thEntry:"Entry point", thCoverage:"Coverage", open:"Open",
+  footerNote:"Links point only to public, third-party repos, live exploit hosts and forums — nothing except this page itself is hosted by us. Jailbreaking voids your warranty and can break PSN access; using it to pirate games is illegal in most places. Confirm you're on the real project page before downloading anything — fake mirrors of these exact names are common. Firmware numbers shift constantly; treat this as a snapshot, not a guarantee.",
+  footerCredits:"Built for the scene. Not affiliated with Sony.",
+  steps:[{n:"1",t:"Kickoff — Find your entry",d:"A WebKit bug, a network exploit, or a game/app bug opens the door, depending on your firmware."},
+    {n:"2",t:"Half-Time — Run the loader",d:"A self-hosted server or an in-app loader lets you send and run your own code."},
+    {n:"3",t:"Full-Time — Payload + tools",d:"A HEN payload, then homebrew, backups and manager apps on your own console."}]
+}),
+arz: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"كل نقطة دخول، كل بايلود، وكل أداة بعد الجيلبريك، لجهازين مع بعض.",
+  badge:"PS5 + PS4 · استغلالات وبايلودز وأدوات", languageLabel:"اللغة",
+  tickerA:"⚠ مفيش هوست بضغطة واحدة لأي جهاز", tickerB:"🎮 أدوات مطورين لـ PS5 و PS4", tickerC:"🚫 مالوش علاقة بشركة Sony",
+  calloutTag:"تنبيه", calloutBody:"لسه معدش فيه موقع عام تدخله وياخد جهازك يتفتح لوحده. ثغرة الـ WebKit محتاجة صفحة أو برنامج تشغّله انت بنفسك، وجهازك بيتصل بيه. أرقام الفيرموير هنا بتتغير بسرعة وبعضها كلام مطورين مش مؤكد من تراكرز — اتأكد من الريبو قبل ما تعتمد على رقم.",
+  recTag:"مراجعة VAR", recTitle:"دوّر على الجيلبريك بتاعك", recSub:"اكتب رقم فيرموير الـ PS5.", recSubPs4:"اكتب رقم فيرموير الـ PS4.", recButton:"رشّحلي",
+  recNone:"لسه معدش فيه استغلال عام بيوصل للفيرموير ده. المشهد بيتحرك بسرعة.", recFoundPrefix:"الانسب لفيرموير",
+  payRecTag:"مراجعة VAR · بايلودز", payRecTitle:"دوّر على البايلود بتاعك", payRecSub:"اكتب رقم فيرموير الـ PS5.", payRecSubPs4:"اكتب رقم فيرموير الـ PS4.",
+  payRecNone:"لسه معدش فيه بايلود عام بيغطي الفيرموير ده.", payRecFoundPrefix:"الانسب لفيرموير",
+  webkitTitle:"استغلالات WebKit", webkitSub:"جيلبريك نواة كامل، عن طريق المتصفح",
+  usermodeTitle:"استغلالات Usermode", usermodeSub:"كود بس، مش جيلبريك كامل",
+  exploitsTitlePs4:"استغلالات وهوستات", payloadsTitle:"بايلودز / HEN", payloadsSub:"بتشتغل بعد الاستغلال — منشّط هوم برو",
+  toolsTitle:"بعد ما تعمل جيلبريك", toolsSub:"أدوات إدارة، مش استغلالات",
+  communityTitle:"المجتمع", creditsTitle:"شكر وتقدير", creditsSub:"من غير الناس دي معدش كان فيه حاجة",
+  tableTitle:"جدول التغطية", thHash:"#", thExploit:"الاستغلال", thDev:"المطوّر", thEntry:"نقطة الدخول", thCoverage:"التغطية", open:"فتح",
+  footerNote:"الروابط بتودّيك لمستودعات ومنتديات عامة وهوستات حقيقية تابعة لجهات تانية — احنا مش مستضيفين غير الصفحة دي بس. الجيلبريك بيلغي الضمان وممكن يقفلك PSN، واستخدامه في تحميل ألعاب مقرصنة مخالف للقانون في أغلب البلاد. اتأكد انك في الصفحة الرسمية قبل التحميل — تقليد الأسامي دي شائع. أرقام الفيرموير بتتغير باستمرار، خدها كصورة لحظية مش ضمان.",
+  footerCredits:"اتعمل لعشاق المشهد. مالوش علاقة بشركة Sony.",
+  steps:[{n:"1",t:"البداية — دوّر على نقطة دخولك",d:"ثغرة WebKit أو استغلال شبكة أو ثغرة لعبة/تطبيق بتفتحلك الباب، حسب الفيرموير."},
+    {n:"2",t:"الشوط التاني — شغّل المحمّل",d:"سيرفر تستضيفه بنفسك أو محمّل جوه تطبيق بيخليك تشغّل الكود بتاعك."},
+    {n:"3",t:"آخر المباراة — بايلود وأدوات",d:"بايلود HEN، وبعدين هوم برو ونسخ احتياطية وأدوات إدارة على جهازك."}]
+}),
+ar: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"كل نقطة دخول، وكل حمولة، وكل أداة بعد الجيلبريك، للجهازين معاً.",
+  badge:"PS5 + PS4 · استغلالات وحمولات وأدوات", languageLabel:"اللغة",
+  tickerA:"⚠ لا يوجد مضيف بضغطة واحدة لأي جهاز", tickerB:"🎮 أدوات مطورين لـ PS5 و PS4", tickerC:"🚫 لا علاقة له بشركة Sony",
+  calloutTag:"تنبيه", calloutBody:"لا يوجد حتى الآن موقع عام يفتح جهازك بمجرد زيارته. ثغرة WebKit تحتاج صفحة أو برنامج مضيف تشغّله بنفسك، ويتصل به جهازك. أرقام الفيرموير هنا تتغير بسرعة، وبعضها تصريحات مطورين غير مؤكدة من متتبعي المشهد — تأكد من المستودع قبل الاعتماد على أي رقم.",
+  recTag:"مراجعة VAR", recTitle:"ابحث عن الجيلبريك المناسب", recSub:"اكتب إصدار فيرموير الـ PS5.", recSubPs4:"اكتب إصدار فيرموير الـ PS4.", recButton:"رشّح لي",
+  recNone:"لا يوجد استغلال عام يصل إلى هذا الفيرموير بعد. المشهد يتحرك بسرعة.", recFoundPrefix:"الأنسب لفيرموير",
+  payRecTag:"مراجعة VAR · الحمولات", payRecTitle:"ابحث عن الحمولة المناسبة", payRecSub:"اكتب إصدار فيرموير الـ PS5.", payRecSubPs4:"اكتب إصدار فيرموير الـ PS4.",
+  payRecNone:"لا توجد حمولة عامة تغطي هذا الفيرموير بعد.", payRecFoundPrefix:"الأنسب لفيرموير",
+  webkitTitle:"استغلالات WebKit", webkitSub:"جيلبريك نواة كامل عبر المتصفح",
+  usermodeTitle:"استغلالات Usermode", usermodeSub:"تنفيذ كود فقط — ليس جيلبريك كاملاً",
+  exploitsTitlePs4:"الاستغلالات والمضيفات", payloadsTitle:"الحمولات / HEN", payloadsSub:"تعمل بعد الاستغلال — منشّط الهوم برو",
+  toolsTitle:"بعد الجيلبريك", toolsSub:"أدوات إدارة، وليست استغلالات",
+  communityTitle:"المجتمع", creditsTitle:"شكر وتقدير", creditsSub:"لا شيء من هذا كان ليتحقق دون هؤلاء",
+  tableTitle:"جدول التغطية", thHash:"#", thExploit:"الاستغلال", thDev:"المطوّر", thEntry:"نقطة الدخول", thCoverage:"التغطية", open:"فتح",
+  footerNote:"تشير الروابط فقط إلى مستودعات ومنتديات عامة ومضيفات حقيقية تابعة لجهات خارجية — لا نستضيف شيئاً سوى هذه الصفحة نفسها. الجيلبريك يُلغي الضمان وقد يمنع الوصول إلى PSN، واستخدامه لتحميل نسخ مقرصنة مخالف للقانون في معظم الأماكن. تأكد أنك في الصفحة الرسمية قبل التحميل — تقليد هذه الأسماء شائع. أرقام الفيرموير تتغير باستمرار، فتعامل معها كلقطة لحظية لا كضمان.",
+  footerCredits:"صُمم لعشاق المشهد. لا علاقة له بشركة Sony.",
+  steps:[{n:"1",t:"البداية — ابحث عن نقطة دخولك",d:"ثغرة WebKit أو استغلال شبكة أو ثغرة لعبة/تطبيق تفتح الطريق، حسب الفيرموير."},
+    {n:"2",t:"الشوط الثاني — شغّل المحمّل",d:"خادم تستضيفه بنفسك أو محمّل داخل تطبيق يتيح لك تشغيل الكود الخاص بك."},
+    {n:"3",t:"نهاية المباراة — حمولة وأدوات",d:"حمولة HEN، ثم هوم برو ونسخ احتياطية وتطبيقات إدارة على جهازك."}]
+}),
+es: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"Cada punto de entrada, payload y herramienta post-jailbreak, para ambas consolas.",
+  badge:"PS5 + PS4 · exploits, payloads y herramientas", languageLabel:"Idioma",
+  tickerA:"⚠ No existe host de un clic para ninguna consola", tickerB:"🎮 Herramientas de dev de PS5 y PS4", tickerC:"🚫 Sin relación con Sony",
+  calloutTag:"Fuera de juego", calloutBody:"Todavía no existe un sitio público donde visitar una página jailbreakee una consola sola. Un exploit WebKit necesita una página o programa host que tú mismo ejecutas, al que se conecta tu consola. Los límites de firmware aquí cambian rápido y algunos son reportados por devs, no confirmados por trackers — revisa el repo antes de confiar en un número.",
+  recTag:"Revisión VAR", recTitle:"Encuentra tu jailbreak", recSub:"Escribe tu versión de firmware de PS5.", recSubPs4:"Escribe tu versión de firmware de PS4.", recButton:"Recomendar",
+  recNone:"Aún no hay exploit público para ese firmware. La escena avanza rápido.", recFoundPrefix:"Coincidencias para firmware",
+  payRecTag:"Revisión VAR · payloads", payRecTitle:"Encuentra tu payload", payRecSub:"Escribe tu versión de firmware de PS5.", payRecSubPs4:"Escribe tu versión de firmware de PS4.",
+  payRecNone:"Aún no hay payload público para ese firmware.", payRecFoundPrefix:"Coincidencias para firmware",
+  webkitTitle:"Exploits WebKit", webkitSub:"Jailbreak de kernel completo, vía navegador",
+  usermodeTitle:"Exploits Usermode", usermodeSub:"Solo código nativo — no es jailbreak completo",
+  exploitsTitlePs4:"Exploits y hosts", payloadsTitle:"Payloads / HEN", payloadsSub:"Corre después del exploit — habilitador de homebrew",
+  toolsTitle:"Después del jailbreak", toolsSub:"Gestores y utilidades, no exploits",
+  communityTitle:"Comunidad", creditsTitle:"Créditos", creditsSub:"Nada de esto existiría sin esta gente",
+  tableTitle:"Tabla de cobertura", thHash:"#", thExploit:"Exploit", thDev:"Dev", thEntry:"Punto de entrada", thCoverage:"Cobertura", open:"Abrir",
+  footerNote:"Los enlaces solo apuntan a repos públicos, hosts de exploit reales y foros de terceros — no alojamos nada más que esta página. El jailbreak anula tu garantía y puede bloquear el acceso a PSN; usarlo para piratear es ilegal en la mayoría de países. Confirma que estás en la página oficial antes de descargar nada. Los números de firmware cambian constantemente; trátalos como una foto del momento, no una garantía.",
+  footerCredits:"Hecho para la escena. Sin relación con Sony.",
+  steps:[{n:"1",t:"Inicio — Encuentra tu entrada",d:"Un fallo de WebKit, un exploit de red o un fallo de juego/app abre la puerta, según tu firmware."},
+    {n:"2",t:"Descanso — Ejecuta el loader",d:"Un servidor autoalojado o un loader dentro de la app te deja enviar y ejecutar tu código."},
+    {n:"3",t:"Final — Payload y herramientas",d:"Un payload HEN, luego homebrew, backups y apps gestoras en tu consola."}]
+}),
+fr: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"Chaque point d'entrée, payload et outil post-jailbreak, pour les deux consoles.",
+  badge:"PS5 + PS4 · exploits, payloads et outils", languageLabel:"Langue",
+  tickerA:"⚠ Aucun hôte en un clic pour aucune des deux consoles", tickerB:"🎮 Outils dev PS5 et PS4 suivis", tickerC:"🚫 Aucun lien avec Sony",
+  calloutTag:"Hors-jeu", calloutBody:"Il n'existe toujours aucun site public où visiter une page jailbreake une console toute seule. Un exploit WebKit nécessite une page ou un programme hôte que vous lancez vous-même, auquel votre console se connecte. Les plafonds de firmware ici bougent vite et certains sont annoncés par les devs sans être confirmés par les trackers — vérifiez le dépôt avant de vous fier à un chiffre.",
+  recTag:"Revue VAR", recTitle:"Trouvez votre jailbreak", recSub:"Indiquez votre firmware PS5.", recSubPs4:"Indiquez votre firmware PS4.", recButton:"Recommander",
+  recNone:"Aucun exploit public n'atteint encore ce firmware. La scène bouge vite.", recFoundPrefix:"Résultats pour le firmware",
+  payRecTag:"Revue VAR · payloads", payRecTitle:"Trouvez votre payload", payRecSub:"Indiquez votre firmware PS5.", payRecSubPs4:"Indiquez votre firmware PS4.",
+  payRecNone:"Aucun payload public ne couvre encore ce firmware.", payRecFoundPrefix:"Résultats pour le firmware",
+  webkitTitle:"Exploits WebKit", webkitSub:"Jailbreak kernel complet, via le navigateur",
+  usermodeTitle:"Exploits Usermode", usermodeSub:"Code natif seulement — pas un jailbreak complet",
+  exploitsTitlePs4:"Exploits et hôtes", payloadsTitle:"Payloads / HEN", payloadsSub:"Tourne après l'exploit — activateur homebrew",
+  toolsTitle:"Une fois jailbreaké", toolsSub:"Gestionnaires et utilitaires, pas des exploits",
+  communityTitle:"Communauté", creditsTitle:"Crédits", creditsSub:"Rien de tout ça sans ces personnes",
+  tableTitle:"Tableau de couverture", thHash:"#", thExploit:"Exploit", thDev:"Dev", thEntry:"Point d'entrée", thCoverage:"Couverture", open:"Ouvrir",
+  footerNote:"Les liens pointent uniquement vers des dépôts publics, de vrais hôtes d'exploit et des forums tiers — nous n'hébergeons rien d'autre que cette page. Le jailbreak annule votre garantie et peut bloquer le PSN ; l'utiliser pour pirater est illégal dans la plupart des pays. Vérifiez que vous êtes sur la vraie page du projet avant de télécharger quoi que ce soit. Les chiffres de firmware changent sans cesse ; considérez-les comme un instantané, pas une garantie.",
+  footerCredits:"Fait pour la scène. Aucun lien avec Sony.",
+  steps:[{n:"1",t:"Coup d'envoi — Trouvez votre entrée",d:"Une faille WebKit, un exploit réseau ou une faille de jeu/app ouvre la porte, selon votre firmware."},
+    {n:"2",t:"Mi-temps — Lancez le loader",d:"Un serveur auto-hébergé ou un loader dans l'app vous permet d'exécuter votre propre code."},
+    {n:"3",t:"Fin du match — Payload et outils",d:"Un payload HEN, puis homebrew, sauvegardes et apps de gestion sur votre console."}]
+}),
+ru: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"Все публичные точки входа, пейлоады и инструменты после джейлбрейка — для обеих консолей.",
+  badge:"PS5 + PS4 · эксплойты, пейлоады и инструменты", languageLabel:"Язык",
+  tickerA:"⚠ Хоста в один клик нет ни для одной консоли", tickerB:"🎮 Отслеживаются инструменты разработчиков PS5 и PS4", tickerC:"🚫 Не связано с Sony",
+  calloutTag:"Офсайд", calloutBody:"Публичного сайта, который сам джейлбрейкает консоль при посещении, всё ещё не существует. Эксплойту WebKit нужна хост-страница или программа, которую вы сами запускаете, а консоль к ней подключается. Потолки прошивок здесь быстро меняются, некоторые заявлены разработчиками, но не подтверждены трекерами — проверяйте репозиторий, прежде чем доверять цифре.",
+  recTag:"Проверка VAR", recTitle:"Найдите свой джейлбрейк", recSub:"Введите версию прошивки PS5.", recSubPs4:"Введите версию прошивки PS4.", recButton:"Рекомендовать",
+  recNone:"Для этой прошивки пока нет публичного эксплойта. Сцена движется быстро.", recFoundPrefix:"Подходит для прошивки",
+  payRecTag:"Проверка VAR · пейлоады", payRecTitle:"Найдите свой пейлоад", payRecSub:"Введите версию прошивки PS5.", payRecSubPs4:"Введите версию прошивки PS4.",
+  payRecNone:"Для этой прошивки пока нет публичного пейлоада.", payRecFoundPrefix:"Подходит для прошивки",
+  webkitTitle:"WebKit-эксплойты", webkitSub:"Полный джейлбрейк ядра, через браузер",
+  usermodeTitle:"Usermode-эксплойты", usermodeSub:"Только выполнение кода — не полный джейлбрейк",
+  exploitsTitlePs4:"Эксплойты и хосты", payloadsTitle:"Пейлоады / HEN", payloadsSub:"Работает после эксплойта — активатор homebrew",
+  toolsTitle:"После джейлбрейка", toolsSub:"Менеджеры и утилиты, не эксплойты",
+  communityTitle:"Сообщество", creditsTitle:"Благодарности", creditsSub:"Ничего этого не было бы без этих людей",
+  tableTitle:"Таблица покрытия", thHash:"#", thExploit:"Эксплойт", thDev:"Автор", thEntry:"Точка входа", thCoverage:"Покрытие", open:"Открыть",
+  footerNote:"Ссылки ведут только на публичные сторонние репозитории, реальные хосты эксплойтов и форумы — кроме этой страницы мы ничего не размещаем. Джейлбрейк аннулирует гарантию и может заблокировать PSN; использование для пиратства незаконно в большинстве стран. Убедитесь, что вы на настоящей странице проекта, прежде чем что-либо скачивать. Цифры прошивок постоянно меняются — считайте их снимком момента, а не гарантией.",
+  footerCredits:"Сделано для сцены. Не связано с Sony.",
+  steps:[{n:"1",t:"Начало — найдите точку входа",d:"Баг WebKit, сетевой эксплойт или баг игры/приложения открывает дверь — в зависимости от прошивки."},
+    {n:"2",t:"Перерыв — запустите загрузчик",d:"Локальный сервер или загрузчик внутри приложения позволяет запускать свой код."},
+    {n:"3",t:"Конец матча — пейлоад и инструменты",d:"Пейлоад HEN, затем homebrew, бэкапы и менеджеры на вашей консоли."}]
+}),
+de: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"Jeder öffentliche Einstiegspunkt, Payload und Post-Jailbreak-Tool, für beide Konsolen.",
+  badge:"PS5 + PS4 · Exploits, Payloads & Tools", languageLabel:"Sprache",
+  tickerA:"⚠ Kein Ein-Klick-Host für beide Konsolen", tickerB:"🎮 PS5- und PS4-Dev-Tools erfasst", tickerC:"🚫 Keine Verbindung zu Sony",
+  calloutTag:"Abseits-Check", calloutBody:"Es gibt weiterhin keine öffentliche Seite, die eine Konsole allein durch Besuch jailbreakt. Ein WebKit-Exploit braucht eine Host-Seite oder ein Programm, das du selbst ausführst und mit dem sich deine Konsole verbindet. Firmware-Obergrenzen hier ändern sich schnell, manche sind nur Entwickleraussagen, nicht von Trackern bestätigt — prüfe das Repo, bevor du dich auf eine Zahl verlässt.",
+  recTag:"VAR-Check", recTitle:"Finde deinen Jailbreak", recSub:"Gib deine PS5-Firmware-Version ein.", recSubPs4:"Gib deine PS4-Firmware-Version ein.", recButton:"Empfehlen",
+  recNone:"Für diese Firmware gibt es noch keinen öffentlichen Exploit. Die Szene bewegt sich schnell.", recFoundPrefix:"Treffer für Firmware",
+  payRecTag:"VAR-Check · Payloads", payRecTitle:"Finde deinen Payload", payRecSub:"Gib deine PS5-Firmware-Version ein.", payRecSubPs4:"Gib deine PS4-Firmware-Version ein.",
+  payRecNone:"Für diese Firmware gibt es noch keinen öffentlichen Payload.", payRecFoundPrefix:"Treffer für Firmware",
+  webkitTitle:"WebKit-Exploits", webkitSub:"Vollständiger Kernel-Jailbreak, über den Browser",
+  usermodeTitle:"Usermode-Exploits", usermodeSub:"Nur Codeausführung — kein vollständiger Jailbreak",
+  exploitsTitlePs4:"Exploits & Hosts", payloadsTitle:"Payloads / HEN", payloadsSub:"Läuft nach dem Exploit — Homebrew-Enabler",
+  toolsTitle:"Nach dem Jailbreak", toolsSub:"Manager & Tools, keine Exploits",
+  communityTitle:"Community", creditsTitle:"Credits", creditsSub:"Ohne diese Leute gäbe es nichts davon",
+  tableTitle:"Abdeckungstabelle", thHash:"#", thExploit:"Exploit", thDev:"Entwickler", thEntry:"Einstiegspunkt", thCoverage:"Abdeckung", open:"Öffnen",
+  footerNote:"Links verweisen nur auf öffentliche externe Repos, echte Exploit-Hosts und Foren — außer dieser Seite hosten wir nichts. Jailbreaking macht die Garantie ungültig und kann PSN blockieren; damit Spiele zu piraten ist in den meisten Ländern illegal. Prüfe vor jedem Download, ob du auf der echten Projektseite bist. Firmware-Zahlen ändern sich ständig — behandle sie als Momentaufnahme, nicht als Garantie.",
+  footerCredits:"Gemacht für die Szene. Keine Verbindung zu Sony.",
+  steps:[{n:"1",t:"Anpfiff — Finde deinen Einstieg",d:"Ein WebKit-Bug, ein Netzwerk-Exploit oder ein Spiel-/App-Bug öffnet die Tür, je nach Firmware."},
+    {n:"2",t:"Halbzeit — Loader starten",d:"Ein selbst gehosteter Server oder ein In-App-Loader lässt dich eigenen Code ausführen."},
+    {n:"3",t:"Abpfiff — Payload & Tools",d:"Ein HEN-Payload, dann Homebrew, Backups und Manager-Apps auf deiner Konsole."}]
+}),
+hi: mk({
+  brand:"PSJB", brand2:"PSJB", tagline:"दोनों कंसोल के लिए हर एंट्री पॉइंट, पेलोड और जेलब्रेक के बाद का टूल।",
+  badge:"PS5 + PS4 · एक्सप्लॉइट, पेलोड और टूल्स", languageLabel:"भाषा",
+  tickerA:"⚠ किसी भी कंसोल के लिए वन-क्लिक होस्ट नहीं है", tickerB:"🎮 PS5 और PS4 डेव टूल्स ट्रैक किए गए", tickerC:"🚫 Sony से कोई संबंध नहीं",
+  calloutTag:"ऑफसाइड चेक", calloutBody:"अभी भी ऐसी कोई सार्वजनिक साइट नहीं है जहाँ पेज खोलते ही कंसोल अपने आप जेलब्रेक हो जाए। WebKit एक्सप्लॉइट के लिए एक होस्ट पेज या प्रोग्राम चाहिए जिसे आप खुद चलाते हैं। यहाँ दिखाए फर्मवेयर आंकड़े तेज़ी से बदलते हैं, कुछ सिर्फ डेवलपर के दावे हैं, ट्रैकर से पुष्टि नहीं — भरोसा करने से पहले रिपॉज़िटरी ज़रूर देखें।",
+  recTag:"VAR समीक्षा", recTitle:"अपना जेलब्रेक ढूंढें", recSub:"अपना PS5 फर्मवेयर वर्शन लिखें।", recSubPs4:"अपना PS4 फर्मवेयर वर्शन लिखें।", recButton:"सुझाव दें",
+  recNone:"इस फर्मवेयर के लिए अभी कोई सार्वजनिक एक्सप्लॉइट नहीं है।", recFoundPrefix:"फर्मवेयर के लिए मिलान",
+  payRecTag:"VAR समीक्षा · पेलोड", payRecTitle:"अपना पेलोड ढूंढें", payRecSub:"अपना PS5 फर्मवेयर वर्शन लिखें।", payRecSubPs4:"अपना PS4 फर्मवेयर वर्शन लिखें।",
+  payRecNone:"इस फर्मवेयर के लिए अभी कोई सार्वजनिक पेलोड नहीं है।", payRecFoundPrefix:"फर्मवेयर के लिए मिलान",
+  webkitTitle:"WebKit एक्सप्लॉइट", webkitSub:"पूरा कर्नेल जेलब्रेक, ब्राउज़र के ज़रिए",
+  usermodeTitle:"Usermode एक्सप्लॉइट", usermodeSub:"सिर्फ कोड चलता है — पूरा जेलब्रेक नहीं",
+  exploitsTitlePs4:"एक्सप्लॉइट और होस्ट", payloadsTitle:"पेलोड / HEN", payloadsSub:"एक्सप्लॉइट के बाद चलता है — होमब्रू इनेबलर",
+  toolsTitle:"जेलब्रेक के बाद", toolsSub:"मैनेजर और यूटिलिटी, एक्सप्लॉइट नहीं",
+  communityTitle:"कम्युनिटी", creditsTitle:"क्रेडिट्स", creditsSub:"इन लोगों के बिना कुछ भी मुमकिन नहीं था",
+  tableTitle:"कवरेज टेबल", thHash:"#", thExploit:"एक्सप्लॉइट", thDev:"डेवलपर", thEntry:"एंट्री पॉइंट", thCoverage:"कवरेज", open:"खोलें",
+  footerNote:"लिंक सिर्फ सार्वजनिक थर्ड-पार्टी रिपॉज़िटरी, असली एक्सप्लॉइट होस्ट और फोरम की ओर जाते हैं — इस पेज के अलावा कुछ भी यहाँ होस्ट नहीं है। जेलब्रेक करने से वारंटी खत्म होती है और PSN बंद हो सकता है; पाइरेसी के लिए इस्तेमाल करना ज़्यादातर जगह गैरकानूनी है। डाउनलोड करने से पहले असली प्रोजेक्ट पेज पक्का करें। फर्मवेयर आंकड़े लगातार बदलते हैं — इन्हें गारंटी नहीं, बस एक पल की झलक मानें।",
+  footerCredits:"सीन के लिए बनाया गया। Sony से कोई संबंध नहीं।",
+  steps:[{n:"1",t:"किकऑफ — अपनी एंट्री ढूंढें",d:"फर्मवेयर के हिसाब से WebKit बग, नेटवर्क एक्सप्लॉइट या गेम/ऐप बग रास्ता खोलता है।"},
+    {n:"2",t:"हाफ-टाइम — लोडर चलाएं",d:"सेल्फ-होस्टेड सर्वर या ऐप के अंदर का लोडर आपका कोड चलाने देता है।"},
+    {n:"3",t:"फुल-टाइम — पेलोड और टूल्स",d:"एक HEN पेलोड, फिर होमब्रू, बैकअप और मैनेजर ऐप्स आपके कंसोल पर।"}]
+})
+};
+
+let currentLang = "en", currentPlatform = "ps5";
+
+function cardHTML(c, openLabel){
+  return `<a class="card" href="${c.url}" target="_blank" rel="noopener">
+    <div class="card-in"><span class="tag-pill">${c.tag}</span>
+      <div class="card-top"><h3>${c.title}</h3>${c.stat?`<div class="stat"><div class="val">${c.stat}</div><div class="lbl">${c.lbl}</div></div>`:""}</div>
+      <p class="dev">${c.dev}</p><p class="desc">${c.desc}</p><span class="openbtn">${openLabel}</span>
+    </div></a>`;
+}
+function tableRows(list){
+  return list.map((r,i)=>`<tr><td class="rank">${i+1}</td><td>${r.title}</td><td>${r.dev}</td><td>${r.entry||"—"}</td><td>${r.coverage||"—"}</td></tr>`).join("");
+}
+function renderLangMenu(){
+  const menu = document.getElementById("langmenu");
+  menu.innerHTML = LANGS.map(l=>`<button data-code="${l.code}" class="${l.code===currentLang?'active':''}">${l.native}</button>`).join("");
+  menu.querySelectorAll("button").forEach(b=> b.addEventListener("click", ()=>{ render(b.getAttribute("data-code")); menu.classList.remove("open"); }));
+}
+
+function render(lang){
+  currentLang = lang; const c = content[lang]; const meta = LANGS.find(l=>l.code===lang);
+  document.documentElement.lang = lang; document.documentElement.dir = meta.rtl ? "rtl" : "ltr";
+  document.body.classList.toggle("lang-ar", lang==="ar"||lang==="arz"); document.body.classList.toggle("lang-hi", lang==="hi");
+
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ const k=el.getAttribute("data-i18n"); if(c[k]!==undefined) el.textContent = c[k]; });
+  document.getElementById("langbtn").title = c.languageLabel;
+  document.getElementById("ticker").innerHTML = [c.tickerA,c.tickerB,c.tickerC].map(x=>`<span>${x}</span>`).join("");
+  document.getElementById("steps").innerHTML = c.steps.map(s=>`<div class="step"><div class="num">${s.n}</div><h3>${s.t}</h3><p>${s.d}</p></div>`).join("");
+
+  document.getElementById("ps5Webkit").innerHTML = PS5_WEBKIT.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("ps5Usermode").innerHTML = PS5_USERMODE.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("ps5Payloads").innerHTML = PS5_PAYLOADS.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("ps5Community").innerHTML = PS5_COMMUNITY.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("ps4Exploits").innerHTML = PS4_EXPLOITS.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("ps4Payloads").innerHTML = PS4_PAYLOADS.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("ps4Community").innerHTML = PS4_COMMUNITY.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("toolsSquad").innerHTML = TOOLS.map(x=>cardHTML(x,c.open)).join("");
+  document.getElementById("creditsGrid").innerHTML = CREDITS.map(n=>`<span class="credit-chip">${n}</span>`).join("");
+
+  const thCells = [c.thHash,c.thExploit,c.thDev,c.thEntry,c.thCoverage].map(h=>`<th>${h}</th>`).join("");
+  document.getElementById("ps5TheadRow").innerHTML = thCells; document.getElementById("ps4TheadRow").innerHTML = thCells;
+  document.getElementById("ps5Tbody").innerHTML = tableRows([...PS5_WEBKIT, ...PS5_USERMODE]);
+  document.getElementById("ps4Tbody").innerHTML = tableRows(PS4_EXPLOITS);
+
+  renderLangMenu();
+  recommend(currentPlatform==="ps5"?[...PS5_WEBKIT,...PS5_USERMODE]:PS4_EXPLOITS, document.getElementById(currentPlatform==="ps5"?"ps5FwInput":"ps4FwInput"), document.getElementById(currentPlatform==="ps5"?"ps5FwResults":"ps4FwResults"), c.recNone, c.recFoundPrefix);
+  recommend(currentPlatform==="ps5"?PS5_PAYLOADS:PS4_PAYLOADS, document.getElementById(currentPlatform==="ps5"?"ps5PayInput":"ps4PayInput"), document.getElementById(currentPlatform==="ps5"?"ps5PayResults":"ps4PayResults"), c.payRecNone, c.payRecFoundPrefix);
+}
+
+function recommend(pool, inputEl, resultEl, noneText, foundPrefix){
+  if(!inputEl || !resultEl) return;
+  const raw = inputEl.value.trim();
+  if(!raw){ resultEl.innerHTML = ""; return; }
+  const fw = parseFloat(raw.replace(",", "."));
+  if(isNaN(fw)){ resultEl.innerHTML = ""; return; }
+  const hits = pool.filter(x => x.min!=null && fw>=x.min && fw<=x.max);
+  if(hits.length===0){ resultEl.innerHTML = `<div>${noneText}</div>`; }
+  else { resultEl.innerHTML = `<div>${foundPrefix} ${fw}:</div><div class="found-list">` +
+    hits.map(h=>`<a class="rec-hit" href="${h.url}" target="_blank" rel="noopener"><b>${h.title}</b><span>${h.dev} · ${h.coverage||""}</span></a>`).join("") + `</div>`; }
+}
+
+function setPlatform(p){
+  currentPlatform = p;
+  document.getElementById("tabPs5").classList.toggle("active", p==="ps5");
+  document.getElementById("tabPs4").classList.toggle("active", p==="ps4");
+  ["ps5Section","ps5Section2","ps5Section3","ps5Section4","ps5Section5"].forEach(id=> document.getElementById(id).classList.toggle("hidden", p!=="ps5"));
+  ["ps4Section","ps4Section2","ps4Section3","ps4Section4"].forEach(id=> document.getElementById(id).classList.toggle("hidden", p!=="ps4"));
+  render(currentLang);
+}
+
+document.getElementById("tabPs5").addEventListener("click", ()=> setPlatform("ps5"));
+document.getElementById("tabPs4").addEventListener("click", ()=> setPlatform("ps4"));
+document.getElementById("langbtn").addEventListener("click", (e)=>{ e.stopPropagation(); document.getElementById("langmenu").classList.toggle("open"); });
+document.addEventListener("click", ()=> document.getElementById("langmenu").classList.remove("open"));
+
+["ps5FwBtn","ps5PayBtn","ps4FwBtn","ps4PayBtn"].forEach(id=>{
+  document.getElementById(id).addEventListener("click", ()=> render(currentLang));
+});
+["ps5FwInput","ps5PayInput","ps4FwInput","ps4PayInput"].forEach(id=>{
+  document.getElementById(id).addEventListener("keydown", (e)=>{ if(e.key==="Enter") render(currentLang); });
+});
+
+render("en");
+</script>
+</body>
+</html>
